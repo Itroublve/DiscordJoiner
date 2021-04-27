@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TokenJoiner")]
-[assembly: AssemblyDescription("A simple token joiner, which bypasses the api's token locking.")]
+[assembly: AssemblyTitle("Itroublve Joiner v2")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("TokenJoiner")]
+[assembly: AssemblyProduct("Itroublve Joiner v2")]
 [assembly: AssemblyCopyright("Copyright © ItroublveHacker.ml")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("9fd45b27-55a2-4aaa-9a72-320aceef2c66")]
+[assembly: Guid("39470288-da99-44c9-9353-67c5c8844ca8")]
 
 // Version information for an assembly consists of the following four values:
 //
