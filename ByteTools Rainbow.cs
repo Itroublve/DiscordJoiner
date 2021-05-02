@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Itroublve_Joiner_v2
+namespace Itroublve_Joiner_v3
 {
     public static class Rainbow
     {
@@ -167,7 +167,7 @@ namespace Itroublve_Joiner_v2
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Send below exception to 'Itroublve Hacker'.\r\n" + (ex.Message), "ItroublveTSC");
+                MessageBox.Show("Send below exception to 'Itroublve'.\r\n" + (ex.Message), "Itroublve Token Manager");
             }
         }
 

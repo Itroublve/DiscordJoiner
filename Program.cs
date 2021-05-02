@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Itroublve_Joiner_v2
+namespace Itroublve_Joiner_v3
 {
     static class Program
     {
@@ -16,7 +13,7 @@ namespace Itroublve_Joiner_v2
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ItroublveJoiner());
+            Application.Run(new TokenManager());
         }
     }
 }
