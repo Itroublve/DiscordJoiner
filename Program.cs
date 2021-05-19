@@ -9,7 +9,7 @@ namespace Itroublve_Joiner_v3
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main() //Entry point
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

