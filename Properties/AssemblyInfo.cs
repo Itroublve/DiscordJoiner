@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Itroublve Token Manager v4")]
+[assembly: AssemblyTitle("Tokens.rip Token Manager v5")]
 [assembly: AssemblyDescription("Started as a tool to join servers, evaulated to being a own multi tool")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Itroublve Token Manager v4")]
-[assembly: AssemblyCopyright("Copyright © ItroublveHacker.ml")]
+[assembly: AssemblyProduct("Tokens.rip Token Manager v5")]
+[assembly: AssemblyCopyright("Copyright © ItroublveHacker.ml & Tokens.rip")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.0.0.0")]
+[assembly: AssemblyVersion("5.0.0.0")]
+[assembly: AssemblyFileVersion("5.0.0.0")]

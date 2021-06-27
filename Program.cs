@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Itroublve_Joiner_v3
+namespace Tokens.rip_Token_Manager
 {
     static class Program
     {

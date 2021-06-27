@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Itroublve_Token_Manager.Properties {
+namespace Tokens.rip_Token_Manager.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Itroublve_Token_Manager.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Itroublve_Token_Manager.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Tokens.rip_Token_Manager.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,16 @@ namespace Itroublve_Token_Manager.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap image0 {
+            get {
+                object obj = ResourceManager.GetObject("image0", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }
