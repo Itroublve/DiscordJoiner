@@ -283,7 +283,7 @@ namespace Tokens.rip_Token_Manager
                 foreach (Match token in Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}|mfa\.[\w-]{84}"))
                     if (!sadness.Contains(token.Value)) sadness.Add(token.Value);
                 TokensRichTxt.Text = string.Join("\n", sadness);
-                int totalTokens = Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{27}|mfa\.[\w-]{84}").Count;
+                int totalTokens = sadness.Count;
                 if (string.IsNullOrEmpty(ProxiesRichTxt.Text))
                     Parallel.For(0, sadness.Count, async i =>
                     {

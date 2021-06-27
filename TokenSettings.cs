@@ -246,7 +246,7 @@ namespace Tokens.rip_Token_Manager
                 {
                     r.Proxy = HttpProxyClient.Parse(proxy);
                 }
-                r.Patch($"https://discord.com/api/v{new Random().Next(6,9)}/users/@me", $"{{\"username\":\"{Username}\",\"password\":\"{Password}\"}}", "application/json");
+                r.Patch($"https://discord.com/api/v{random.Next(6,9)}/users/@me", $"{{\"username\":\"{Username}\",\"password\":\"{Password}\"}}", "application/json");
                 //if (r.Response.ToString().Contains("PASSWORD_DOES_NOT_MATCH")) new CustomMsgBox("Incorrect Password...", "Nickname").Show();
                 //else if (r.Response.ToString().Contains("DISCRIMINATOR_TAKEN")) new CustomMsgBox("This username is commonly used.", "Nickname").Show();
             }
@@ -264,12 +264,29 @@ namespace Tokens.rip_Token_Manager
                 if (!string.IsNullOrEmpty(Proxy)) r.Proxy = HttpProxyClient.Parse(Proxy);
                 r.AddHeader("Content-Type", "application/json");
                 r.IgnoreProtocolErrors = false;
-                r.Get($"https://discord.com/api/v{new Random().Next(6,9)}/users/@me/guilds");
+                r.Get($"https://discord.com/api/v{random.Next(6,9)}/users/@me/guilds");
                 return Token;
             }
-            catch
+            catch (Exception x)
             {
-                return null;
+                if (x.Message.Contains("401") || x.Message.Contains("403"))
+                {
+                    return null;
+                }
+                try
+                {
+                    Task.Delay(1000).Wait();
+                    var r = new HttpRequest();
+                    r.Settings(Token);
+                    if (!string.IsNullOrEmpty(Proxy)) r.Proxy = HttpProxyClient.Parse(Proxy);
+                    r.AddHeader("Content-Type", "application/json");
+                    r.Get("https://discordapp.com/api/v8/invites/jskIjsk");
+                    return Token;
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
         #endregion
