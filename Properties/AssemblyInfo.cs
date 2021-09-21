@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Tokens.rip Token Manager v5")]
+[assembly: AssemblyTitle("Tokens.rip Token Manager")]
 [assembly: AssemblyDescription("Started as a tool to join servers, evaulated to being a own multi tool")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Tokens.rip Token Manager v5")]
-[assembly: AssemblyCopyright("Copyright © ItroublveHacker.ml & Tokens.rip")]
+[assembly: AssemblyCompany("Tokens.rip")]
+[assembly: AssemblyProduct("Tokens.rip Token Manager")]
+[assembly: AssemblyCopyright("Copyright © Tokens-Shop.com | Kleopatra.pro")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -13,7 +13,8 @@ namespace Tokens.rip_Token_Manager
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TokenManager());
-        }
+            Application.Run(new newMainFrm());
+            }
     }
 }
+    
