@@ -11,8 +11,8 @@ using System.Net.Http;
 using Discord.WebSocket;
 using System.Threading;
 using System.Runtime.InteropServices;
-using System.Net.WebSockets;
-using System.Net;
+using WebSocketSharp.Net;
+using WebSocketSharp;
 using System.Text;
 
 namespace Tokens.rip_Token_Manager
@@ -32,9 +32,10 @@ namespace Tokens.rip_Token_Manager
             r.AddHeader("Accept-Language", "en-US");
             r.AddHeader("Authorization", Authorization);
             r.AddHeader("Connection", "keep-alive");
-            r.AddHeader("Cookie", $"__cfduid={TokenSettings.RandomCookie(43)}; __dcfduid={TokenSettings.RandomCookie(32)}; locale=en-US");
+            r.AddHeader("Cookie", $"__dcfduid={TokenSettings.RandomCookie(43)}; __sdcfduid={TokenSettings.RandomCookie(32)}; locale=en-US");
             r.AddHeader("DNT", "1");
             r.AddHeader("Origin", $"{TokenSettings.domains[new Random(Guid.NewGuid().GetHashCode()).Next(TokenSettings.domains.Length)]}");
+            r.AddHeader("X-Fingerprint", $"{TokenSettings.RandomNumber(18)}.{TokenSettings.RandomCookie(27)}");
             r.AddHeader("Referer", $"{TokenSettings.domains[new Random(Guid.NewGuid().GetHashCode()).Next(TokenSettings.domains.Length)]}/channels/@me");
             r.AddHeader("TE", "Trailers");
             r.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9001 Chrome/83.0.4103.122 Electron/9.3.5 Safari/537.36");
@@ -73,6 +74,12 @@ namespace Tokens.rip_Token_Manager
             const string chars = "abcdefghijklmnopqrstuvwxyz0123456789"; //Chars to choose from
             return new string(Enumerable.Repeat(chars, a)
               .Select(s => s[random.Next(s.Length)]).ToArray()); //Enumrate random char
+        }
+        public static string RandomNumber(int a)
+        {
+            const string nr = "01234456789";
+            return new string(Enumerable.Repeat(nr, a)
+                .Select(x => x[random.Next(x.Length)]).ToArray());
         }
         #endregion
         #region Convert Image To Base64
@@ -181,25 +188,77 @@ namespace Tokens.rip_Token_Manager
             }
         }
         #endregion
+        #region WSS Requests
+        #region DiscordConfig
+        public static DiscordSocketClient _UserToken = new DiscordSocketClient(new DiscordSocketConfig
+        {
+            LogLevel = Discord.LogSeverity.Debug
+        });
+        #endregion
         #region Send Token Online
         public static async Task SendOnline(string _Token)
         {
             #region
-            var _UserToken = new DiscordSocketClient(new DiscordSocketConfig
-            {
-                LogLevel = Discord.LogSeverity.Debug
-            });
-            try
-            {
-                await _UserToken.LoginAsync(0, _Token).ConfigureAwait(false);
-                await _UserToken.StartAsync().ConfigureAwait(false);
-                await _UserToken.SetActivityAsync(new Discord.Game("Tokens.rip", Discord.ActivityType.Playing, Discord.ActivityProperties.Join, "Cheap Discord Tokens & Members"));
-            }
-            catch
-            {
-                return;
-            }
+            //try
+            //{
+            //    await _UserToken.LoginAsync(0, _Token).ConfigureAwait(false);
+            //    await _UserToken.StartAsync().ConfigureAwait(false);
+            //    await _UserToken.SetActivityAsync(new Discord.Game("Tokens.rip", Discord.ActivityType.Playing, Discord.ActivityProperties.Join, "Cheap Discord Tokens & Members"));
+            //}
+            //catch
+            //{
+            //    return;
+            //}
             #endregion 
+            using (var WebServerWSS = new WebSocket($"wss://gateway.discord.gg/?v=9&encoding=json"))
+            {
+                string WssResponse = "Still null";
+                string json = @"{
+        'op': 2,
+        'd': {
+                    'token': 'ODkwOTE3MTQ3MjU2MTcyNTY3.YU2xTA.3xwynDmpArqjPeu0K6TNK-tHGI8',
+            'properties': {
+                        '$os': 'Windows',
+                '$browser': 'Chrome',
+                '$device': 'Android Device'
+            },
+            'presence': {
+                        'game': 'fkn',
+                'status': 'online',
+                'since': 0,
+                'afk': False
+            }
+                },
+        's': None,
+        't': None
+        }";
+            WebServerWSS.OnMessage += (sender, e) =>
+                {
+                    MessageBox.Show(e.Data);
+                    WssResponse = e.Data;
+                };
+                WebServerWSS.OnOpen += (sender, e) =>
+                {
+                    MessageBox.Show(json);
+                    WebServerWSS.Send(json);
+                };
+                WebServerWSS.OnClose += (sender, e) =>
+                {
+                    Console.WriteLine(e.Code);
+                };
+                WebServerWSS.OnError += (sender, e) =>
+                {
+                    Console.WriteLine(e.Message);
+                };
+                WebServerWSS.Connect();
+                MessageBox.Show(WssResponse + " This is working now?");
+                //dynamic ResponseJson = JsonConvert.DeserializeObject(WssResponse);
+                //Console.WriteLine(ResponseJson);
+                //int sleep = ResponseJson.d.heartbeat_interval;
+                //Console.WriteLine(WssResponse);
+                //Console.Write(sleep);
+            }
+            #region
             //HttpListener httpListener = new HttpListener();
             //httpListener.Prefixes.Add($"wss://gateway.discord.gg/?v={new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}&encoding=json");
             //httpListener.Start();
@@ -224,20 +283,20 @@ namespace Tokens.rip_Token_Manager
             //        ArraySegment<byte> buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes("x"));
             //    }
             //}
-
+            #endregion
         }
         #endregion
         #region Join VC
         public static async void JoinVoiceAsync()
         {
-
         }
         #endregion
-        #region Leave VC
+            #region Leave VC
         public static async void LeaveVoiceAsync()
         {
 
         }
+        #endregion
         #endregion
         #region Change Nickname [Guild]
         public static async void ChangeNicknameAsync(string NewNickName, string Token, string GuildId, bool Proxied = false, string Proxy = null)
