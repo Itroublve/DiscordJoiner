@@ -11,8 +11,6 @@ using System.Net.Http;
 using Discord.WebSocket;
 using System.Threading;
 using System.Runtime.InteropServices;
-using WebSocketSharp.Net;
-using WebSocketSharp;
 using System.Text;
 
 namespace Tokens.rip_Token_Manager
@@ -20,7 +18,7 @@ namespace Tokens.rip_Token_Manager
     #region Header and setting
     public static class Request
     {
-        public static void Settings(this HttpRequest r, string Authorization)
+        public static void Settings(this HttpRequest r, string Authorization = "unauthorized")
         {
             r.IgnoreProtocolErrors = true;
             r.KeepTemporaryHeadersOnRedirect = false;
@@ -32,15 +30,55 @@ namespace Tokens.rip_Token_Manager
             r.AddHeader("Accept-Language", "en-US");
             r.AddHeader("Authorization", Authorization);
             r.AddHeader("Connection", "keep-alive");
+            r.AddHeader("Sec-Ch-Ua", "\"Chromium\";v=\"94\", \"Google Chrome\";v=\"94\", \";Not A Brand\";v=\"99\"");
+            r.AddHeader("Sec-Ch-Ua-Mobile", "?0");
+            r.AddHeader("Sec-Ch-Ua-Platform", "\"Windows\"");
+            r.AddHeader("Sec-Fetch-Dest", "empty");
+            r.AddHeader("Sec-Fetch-Mode", "cors");
+            r.AddHeader("Sec-Fetch-Site", "same-origin");
+            r.AddHeader("X-Debug-Options", "bugReporterEnabled");
             r.AddHeader("Cookie", $"__dcfduid={TokenSettings.RandomCookie(43)}; __sdcfduid={TokenSettings.RandomCookie(32)}; locale=en-US");
             r.AddHeader("DNT", "1");
             r.AddHeader("Origin", $"{TokenSettings.domains[new Random(Guid.NewGuid().GetHashCode()).Next(TokenSettings.domains.Length)]}");
             r.AddHeader("X-Fingerprint", $"{TokenSettings.RandomNumber(18)}.{TokenSettings.RandomCookie(27)}");
             r.AddHeader("Referer", $"{TokenSettings.domains[new Random(Guid.NewGuid().GetHashCode()).Next(TokenSettings.domains.Length)]}/channels/@me");
             r.AddHeader("TE", "Trailers");
-            r.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9001 Chrome/83.0.4103.122 Electron/9.3.5 Safari/537.36");
-            r.AddHeader("X-Super-Properties", "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiRGlzY29yZCBDbGllbnQiLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfdmVyc2lvbiI6IjEuMC45MDAxIiwib3NfdmVyc2lvbiI6IjEwLjAuMTkwNDIiLCJvc19hcmNoIjoieDY0Iiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiY2xpZW50X2J1aWxkX251bWJlciI6ODMwNDAsImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGx9");
+            r.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36");
+            r.AddHeader("X-Super-Properties", "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzk0LjAuNDYwNi42MSBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTQuMC40NjA2LjYxIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiIiLCJyZWZlcnJpbmdfZG9tYWluIjoiIiwicmVmZXJyZXJfY3VycmVudCI6IiIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6IiIsInJlbGVhc2VfY2hhbm5lbCI6InN0YWJsZSIsImNsaWVudF9idWlsZF9udW1iZXIiOjEwMDA1NCwiY2xpZW50X2V2ZW50X3NvdXJjZSI6bnVsbH0=");
             r.SslProtocols = SslProtocols.Tls12;
+        }
+        #region TokenGen Zone
+        public static void RegisterSettings(this HttpRequest r, string Fingerprint, string Email)
+        {
+            r.IgnoreProtocolErrors = true;
+            r.KeepTemporaryHeadersOnRedirect = false;
+            r.ClearAllHeaders();
+            r.EnableMiddleHeaders = false;
+            r.AllowEmptyHeaderValues = false;
+            r.AddHeader("Accept", "*/*");
+            r.AddHeader("Accept-Encoding", "gzip, deflate, br");
+            r.AddHeader("Accept-Language", "en-US");
+            r.AddHeader("Connection", "keep-alive");
+            r.AddHeader("sec-ch-ua", "\"Chromium\";v=\"94\", \"Google Chrome\";v=\"94\", \";Not A Brand\";v=\"99\"");
+            r.AddHeader("sec-ch-ua-mobile", "?0");
+            r.AddHeader("sec-fetch-dest", "empty");
+            r.AddHeader("sec-fetch-mode", "cors");
+            r.AddHeader("sec-fetch-site", "same-origin");
+            r.AddHeader("X-Debug-Options", "bugReporterEnabled");
+            r.AddHeader("Cookie", $"__dcfduid={TokenSettings.RandomCookie(43)}; __sdcfduid={TokenSettings.RandomCookie(32)};");
+            r.AddHeader("DNT", "1");
+            r.AddHeader("Origin", "https://discord.com");
+            r.AddHeader("Host", "discord.com");
+            r.AddHeader("Authorization", "undefined");
+            if (Fingerprint is null)
+                r.AddHeader("X-Fingerprint", $"{TokenSettings.RandomNumber(18)}.{TokenSettings.RandomCookie(27)}");
+            r.AddHeader("X-Fingerprint", Fingerprint);
+            r.AddHeader("Referer", $"https://discord.com/register?email={Email}");
+            r.AddHeader("TE", "Trailers");
+            r.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36");
+            r.AddHeader("X-Super-Properties", "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzk0LjAuNDYwNi42MSBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTQuMC40NjA2LjYxIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiIiLCJyZWZlcnJpbmdfZG9tYWluIjoiIiwicmVmZXJyZXJfY3VycmVudCI6IiIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6IiIsInJlbGVhc2VfY2hhbm5lbCI6InN0YWJsZSIsImNsaWVudF9idWlsZF9udW1iZXIiOjEwMDA1NCwiY2xpZW50X2V2ZW50X3NvdXJjZSI6bnVsbH0=");
+            r.SslProtocols = SslProtocols.Tls12;
+            #endregion
         }
     }
     #endregion
@@ -189,75 +227,76 @@ namespace Tokens.rip_Token_Manager
         }
         #endregion
         #region WSS Requests
-        #region DiscordConfig
-        public static DiscordSocketClient _UserToken = new DiscordSocketClient(new DiscordSocketConfig
-        {
-            LogLevel = Discord.LogSeverity.Debug
-        });
-        #endregion
-        #region Send Token Online
-        public static async Task SendOnline(string _Token)
-        {
-            #region
-            //try
-            //{
-            //    await _UserToken.LoginAsync(0, _Token).ConfigureAwait(false);
-            //    await _UserToken.StartAsync().ConfigureAwait(false);
-            //    await _UserToken.SetActivityAsync(new Discord.Game("Tokens.rip", Discord.ActivityType.Playing, Discord.ActivityProperties.Join, "Cheap Discord Tokens & Members"));
-            //}
-            //catch
-            //{
-            //    return;
-            //}
-            #endregion 
-            using (var WebServerWSS = new WebSocket($"wss://gateway.discord.gg/?v=9&encoding=json"))
+            #region DiscordConfig
+            public static DiscordSocketClient _UserToken = new DiscordSocketClient(new DiscordSocketConfig
             {
-                string WssResponse = "Still null";
-                string json = @"{
-        'op': 2,
-        'd': {
-                    'token': 'ODkwOTE3MTQ3MjU2MTcyNTY3.YU2xTA.3xwynDmpArqjPeu0K6TNK-tHGI8',
-            'properties': {
-                        '$os': 'Windows',
-                '$browser': 'Chrome',
-                '$device': 'Android Device'
-            },
-            'presence': {
-                        'game': 'fkn',
-                'status': 'online',
-                'since': 0,
-                'afk': False
+                LogLevel = Discord.LogSeverity.Debug
+            });
+            #endregion
+            #region Send Token Online
+            public static async Task SendOnline(string _Token)
+            {
+            #region Works but trash
+            try
+            {
+                await _UserToken.LoginAsync(0, _Token).ConfigureAwait(false);
+                await _UserToken.StartAsync().ConfigureAwait(false);
+                await _UserToken.SetActivityAsync(new Discord.Game("Tokens.rip", Discord.ActivityType.Playing, Discord.ActivityProperties.None, "Cheap Discord Tokens & Members"));
             }
-                },
-        's': None,
-        't': None
-        }";
-            WebServerWSS.OnMessage += (sender, e) =>
-                {
-                    MessageBox.Show(e.Data);
-                    WssResponse = e.Data;
-                };
-                WebServerWSS.OnOpen += (sender, e) =>
-                {
-                    MessageBox.Show(json);
-                    WebServerWSS.Send(json);
-                };
-                WebServerWSS.OnClose += (sender, e) =>
-                {
-                    Console.WriteLine(e.Code);
-                };
-                WebServerWSS.OnError += (sender, e) =>
-                {
-                    Console.WriteLine(e.Message);
-                };
-                WebServerWSS.Connect();
-                MessageBox.Show(WssResponse + " This is working now?");
-                //dynamic ResponseJson = JsonConvert.DeserializeObject(WssResponse);
-                //Console.WriteLine(ResponseJson);
-                //int sleep = ResponseJson.d.heartbeat_interval;
-                //Console.WriteLine(WssResponse);
-                //Console.Write(sleep);
+            catch
+            {
+                return;
             }
+            #endregion
+            #region Non Working Code
+            //    using (var WebServerWSS = new WebSocket($"wss://gateway.discord.gg/?v=9&encoding=json"))
+            //    {
+            //        string WssResponse = "Still null";
+            //        string json = @"{
+            //'op': 2,
+            //'d': {
+            //            'token': 'ODkwOTE3MTQ3MjU2MTcyNTY3.YU2xTA.3xwynDmpArqjPeu0K6TNK-tHGI8',
+            //    'properties': {
+            //                '$os': 'Windows',
+            //        '$browser': 'Chrome',
+            //        '$device': 'Android Device'
+            //    },
+            //    'presence': {
+            //                'game': 'fkn',
+            //        'status': 'online',
+            //        'since': 0,
+            //        'afk': False
+            //    }
+            //        },
+            //'s': None,
+            //'t': None
+            //}";
+            //    WebServerWSS.OnMessage += (sender, e) =>
+            //        {
+            //            MessageBox.Show(e.Data);
+            //            WssResponse = e.Data;
+            //        };
+            //        WebServerWSS.OnOpen += (sender, e) =>
+            //        {
+            //            MessageBox.Show(json);
+            //            WebServerWSS.Send(json);
+            //        };
+            //        WebServerWSS.OnClose += (sender, e) =>
+            //        {
+            //            Console.WriteLine(e.Code);
+            //        };
+            //        WebServerWSS.OnError += (sender, e) =>
+            //        {
+            //            Console.WriteLine(e.Message);
+            //        };
+            //        WebServerWSS.Connect();
+            //        MessageBox.Show(WssResponse + " This is working now?");
+            //        //dynamic ResponseJson = JsonConvert.DeserializeObject(WssResponse);
+            //        //Console.WriteLine(ResponseJson);
+            //        //int sleep = ResponseJson.d.heartbeat_interval;
+            //        //Console.WriteLine(WssResponse);
+            //        //Console.Write(sleep);
+            //    }
             #region
             //HttpListener httpListener = new HttpListener();
             //httpListener.Prefixes.Add($"wss://gateway.discord.gg/?v={new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}&encoding=json");
@@ -284,13 +323,14 @@ namespace Tokens.rip_Token_Manager
             //    }
             //}
             #endregion
+            #endregion
         }
         #endregion
         #region Join VC
         public static async void JoinVoiceAsync()
-        {
-        }
-        #endregion
+            {
+            }
+            #endregion
             #region Leave VC
         public static async void LeaveVoiceAsync()
         {
@@ -423,7 +463,7 @@ namespace Tokens.rip_Token_Manager
                 if (!string.IsNullOrEmpty(Proxy)) r.Proxy = HttpProxyClient.Parse(Proxy);
                 r.AddHeader("Content-Type", "application/json");
                 r.IgnoreProtocolErrors = false;
-                r.Get($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/users/@me/guilds");
+                r.Get($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/users/@me/guild-events");
                 r.Dispose();
                 return Token;
             }
@@ -435,12 +475,11 @@ namespace Tokens.rip_Token_Manager
                 }
                 try
                 {
-                    //MessageBox.Show(Token);
                     var r = new HttpRequest();
                     r.Settings(Token);
                     if (!string.IsNullOrEmpty(Proxy)) r.Proxy = HttpProxyClient.Parse(Proxy);
                     r.IgnoreProtocolErrors = false;
-                    r.Post($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(7,9)}/invites/jskIjsk");
+                    r.Post($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(7,9)}/users/@me/guild-events");
                     r.Dispose();
                     return Token;
                 }
@@ -529,18 +568,71 @@ namespace Tokens.rip_Token_Manager
         /// <param name="Proxies"></param>
         public static async void SendMsg(string Token, string ChannelId, string Message, bool TTS = false, string refId = null, bool Proxied = false, string Proxies = null)
         {
-            var r = new HttpRequest();
-            if (Proxied) r.Proxy = HttpProxyClient.Parse(Proxies);
             try
             {
-                dynamic msgToSpam;
-                if (refId == "Message Reference Id" | refId == null | string.IsNullOrEmpty(refId)) msgToSpam = $"{{\"content\":\"{Message}\",\"tts\":{TTS.ToString().ToLower()}}}";
-                else msgToSpam = $"{{\"content\":\"{Message}\",\"tts\":{TTS.ToString().ToLower()}, \"message_reference\":{{\"channel_id\":\"{ChannelId}\",\"message_id\":\"{refId}\"}}}}";
-                r.Settings(Token);
-                r.AddHeader("content-type", "application/json");
-                r.Post($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/channels/{ChannelId}/messages", msgToSpam, "application/json");
+                var r = new HttpRequest();
+                var s = new HttpClient();
+                var http = new HttpRequestMessage()
+                {
+                    Method = System.Net.Http.HttpMethod.Post,
+                    Content = new System.Net.Http.StringContent("{\"content\":\"nOu\",\"nonce\":\"\",\"tts\":false}", Encoding.UTF8, "application/json"),
+                    RequestUri = new Uri("https://discord.com/api/v7/channels/894015565054771234/messages")
+                };
+                s.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", Token);
+                var response = await s.SendAsync(http).ConfigureAwait(false);
+                Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+                //r.AddHeader("Authorization", Token);
+                //r.Post("https://discord.com/api/v7/channels/894015565054771234/messages", "{\"content\":\"nOu\",\"nonce\":\"\",\"tts\":false}", "application/json");
+                //if (Proxied) r.Proxy = HttpProxyClient.Parse(Proxies);
+                //dynamic msgToSpam;
+                //if (refId == "Message Reference Id" | refId == null | string.IsNullOrEmpty(refId)) msgToSpam = $"{{\"content\":\"{Message}\",\"nonce\":\"\",\"tts\":{TTS.ToString().ToLower()}}}";
+                //else msgToSpam = $"{{\"content\":\"{Message}\",\"nonce\":\"\",\"tts\":{TTS.ToString().ToLower()},\"message_reference\":{{\"channel_id\":\"{ChannelId}\",\"message_id\":\"{refId}\"}}}}";
+                //r.Settings(Token);
+                //r.Post($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/channels/{ChannelId}/messages", msgToSpam, "application/json");
             }
-            catch (Exception x) { MessageBox.Show(x.Message);  }
+            catch{}
+        }
+        #endregion
+        #region Create Account
+        public static async void Register(string Captcha, string Username = null, string Email = null, string Password = null)
+        {
+            #region Client Method
+            //try
+            //{
+            //    var client = new HttpClient();
+            //    var request = new HttpRequestMessage
+            //    {
+            //        Method = System.Net.Http.HttpMethod.Post,
+            //        RequestUri = new Uri("https://discord.com/api/v9/auth/register"),
+            //        Content = new StringContent($"{{\"consent\":true,\"captcha_key\":\"{Captcha}\",\"username\":\"JustFkWorkThx\",\"fingerprint\":\"876871901266456687.nAOSNIpz8B0hczgZFjcgZ6EvbSg\"}}", Encoding.UTF8, "application/json"),
+            //        //Content = new StringContent("{\"consent\":true,\"fingerprint\":\"893558240409960468.epWrrIPx0Z1P3H4m_emXQv52X6I\",\"username\":\"ilovediscordmen\",\"captcha_key\":\"" + Captcha + "\"}", Encoding.UTF8, "application/json"),
+            //    };
+            //    //dynamic payload = $"{{\"consent\": True, \"captcha_key\": \"{Captcha}\", \"username\": \"JustFkWorkThx\", \"fingerprint\": \"876871901266456687.nAOSNIpz8B0hczgZFjcgZ6EvbSg\",}}";
+            //    //client.DefaultRequestHeaders.TryAddWithoutValidation("", "");
+            //    var response = await client.SendAsync(request).ConfigureAwait(false);
+            //    string respResult = response.Content.ReadAsStringAsync().Result;
+
+            //    Console.WriteLine(respResult);
+            //    MessageBox.Show(respResult);
+            //}
+            //catch (Exception x)
+            //{
+            //    Console.WriteLine(x.Message);
+            //}
+            #endregion
+            try
+            {
+                var r = new HttpRequest();
+                r.RegisterSettings("893563800370966538.ORGD_0V_2bl83_BdHXt7juV0dCk", "fuckinghe44ll@sfkjasnf.one");
+                r.Post($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6,9)}/auth/register", 
+                    $"{{\"fingerprint\":\"893563800370966538.ORGD_0V_2bl83_BdHXt7juV0dCk\",\"email\":\"fuckinghe44ll@sfkjasnf.one\",\"username\":\"whateverqj23ijr302\",\"password\":\"WhyDoYouWorkNow\",\"invite\":\"ZYyM7hug\",\"consent\":true\",date_of_birth\":\"1990-05-14\",\"gift_code_sku_id\":\"\",\"captcha_key\":\"{Captcha}\"}}", 
+                    "application/json");
+                Console.WriteLine(r.Response.ToString());
+            }
+            catch (Exception x)
+            {
+                MessageBox.Show(x.Message);
+            }
         }
         #endregion
     }

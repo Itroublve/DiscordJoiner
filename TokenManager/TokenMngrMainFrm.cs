@@ -285,7 +285,9 @@ namespace Tokens.rip_Token_Manager
                 totalTokens = sadness.Count;
                 if (string.IsNullOrEmpty(ProxiesRichTxt.Text))
                 {
-                    foreach (Match token in Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}"))
+                    //foreach (Match token in Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}"))
+                    ThreadPool.SetMinThreads(1000, 1000);
+                    Parallel.ForEach(Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}").Cast<Match>(), async (token) =>
                     {
                         string pain = await TokenSettings.CheckToken(token.Value, null).ConfigureAwait(false);
                         if (!string.IsNullOrEmpty(pain))
@@ -295,12 +297,12 @@ namespace Tokens.rip_Token_Manager
                         Tokens.Add(pain);
                         CurrentStatusLbl.Text = $"Working Tokens: {WorkingTokens.Count}/{totalTokens} | Current Token Count: {Tokens.Count}";
                         CurrentStatusLbl.ForeColor = Color.Yellow;
-                    }
+                    });
                 }
                 else
                 {
                     var proxies = ProxiesRichTxt.Text.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                    ThreadPool.SetMinThreads(500, 500);
+                    ThreadPool.SetMinThreads(1000, 1000);
                     Parallel.ForEach(Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}").Cast<Match>(), async (token, state) =>
                     {
                         string pain = await TokenSettings.CheckToken(token.Value, proxies[new Random(Guid.NewGuid().GetHashCode()).Next(proxies.Length)]).ConfigureAwait(false);

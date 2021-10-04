@@ -57,8 +57,8 @@
     <Reference Include="Discord.Net.WebSocket, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Discord.Net.WebSocket.2.4.0\lib\net461\Discord.Net.WebSocket.dll</HintPath>
     </Reference>
-    <Reference Include="Guna.UI2, Version=2.0.2.0, Culture=neutral, PublicKeyToken=e4b9cdd7b4cde4b4, processorArchitecture=MSIL">
-      <HintPath>packages\Guna.UI2.WinForms.2.0.2\lib\net40\Guna.UI2.dll</HintPath>
+    <Reference Include="Guna.UI2, Version=2.0.2.3, Culture=neutral, PublicKeyToken=e4b9cdd7b4cde4b4, processorArchitecture=MSIL">
+      <HintPath>packages\Guna.UI2.WinForms.2.0.2.3\lib\net40\Guna.UI2.dll</HintPath>
     </Reference>
     <Reference Include="Leaf.xNet, Version=5.2.10.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Leaf.xNet.5.2.10\lib\net45\Leaf.xNet.dll</HintPath>
@@ -255,6 +255,9 @@
     <Reference Include="WebDriver, Version=3.141.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Selenium.WebDriver.3.141.0\lib\net45\WebDriver.dll</HintPath>
     </Reference>
+    <Reference Include="websocket-sharp, Version=1.0.1.0, Culture=neutral, PublicKeyToken=5660b08a1845a91e, processorArchitecture=MSIL">
+      <HintPath>packages\WebSocketSharp-netstandard.1.0.1\lib\net45\websocket-sharp.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -360,10 +363,10 @@
     <Error Condition="!Exists('packages\Fody.6.5.3\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Fody.6.5.3\build\Fody.targets'))" />
     <Error Condition="!Exists('packages\Costura.Fody.5.6.0\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Costura.Fody.5.6.0\build\Costura.Fody.props'))" />
     <Error Condition="!Exists('packages\Costura.Fody.5.6.0\build\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Costura.Fody.5.6.0\build\Costura.Fody.targets'))" />
-    <Error Condition="!Exists('packages\Selenium.WebDriver.ChromeDriver.93.0.4577.1500\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Selenium.WebDriver.ChromeDriver.93.0.4577.1500\build\Selenium.WebDriver.ChromeDriver.targets'))" />
+    <Error Condition="!Exists('packages\Selenium.WebDriver.ChromeDriver.94.0.4606.4101\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Selenium.WebDriver.ChromeDriver.94.0.4606.4101\build\Selenium.WebDriver.ChromeDriver.targets'))" />
   </Target>
   <Import Project="packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
   <Import Project="packages\Fody.6.5.3\build\Fody.targets" Condition="Exists('packages\Fody.6.5.3\build\Fody.targets')" />
   <Import Project="packages\Costura.Fody.5.6.0\build\Costura.Fody.targets" Condition="Exists('packages\Costura.Fody.5.6.0\build\Costura.Fody.targets')" />
-  <Import Project="packages\Selenium.WebDriver.ChromeDriver.93.0.4577.1500\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('packages\Selenium.WebDriver.ChromeDriver.93.0.4577.1500\build\Selenium.WebDriver.ChromeDriver.targets')" />
+  <Import Project="packages\Selenium.WebDriver.ChromeDriver.94.0.4606.4101\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('packages\Selenium.WebDriver.ChromeDriver.94.0.4606.4101\build\Selenium.WebDriver.ChromeDriver.targets')" />
 </Project>

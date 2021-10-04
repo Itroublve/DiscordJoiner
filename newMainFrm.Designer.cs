@@ -184,6 +184,7 @@ namespace Tokens.rip_Token_Manager
             this.tokens_ripLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.tokens_ripLogo.TabIndex = 6359;
             this.tokens_ripLogo.TabStop = false;
+            this.tokens_ripLogo.Click += new System.EventHandler(this.tokens_ripLogo_Click);
             // 
             // newMainFrm
             // 
