@@ -136,6 +136,7 @@ namespace Tokens.rip_Token_Manager
                 TokensRichTxt.ReadOnly = true;
                 ProxiesRichTxt.ReadOnly = true;
                 string invite = InviteTxtbox.Text;
+                invite.Replace(" ", "");
                 invite = invite.Replace("discord.gg/", "");
                 invite = invite.Replace("discord.com/", "");
                 invite = invite.Replace("https://", "");
@@ -219,6 +220,7 @@ namespace Tokens.rip_Token_Manager
                 ProxiesRichTxt.ReadOnly = true;
                 DelayBar.Enabled = false;
                 string invite = InviteTxtbox.Text;
+                invite.Replace(" ", "");
                 invite = invite.Replace("discord.gg/", "");
                 invite = invite.Replace("discord.com/", "");
                 invite = invite.Replace("https://", "");
