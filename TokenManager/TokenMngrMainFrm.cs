@@ -147,35 +147,39 @@ namespace Tokens.rip_Token_Manager
                 invite = invite.Replace("/invites/", "");
                 invite = invite.Replace("v6/invites/", "");
                 invite = invite.Replace("/", "");
+                string[] Invites = invite.Split(',');
                 var r = new HttpRequest();
                 try
                 {
-                    if (!string.IsNullOrEmpty(ProxiesRichTxt.Text))
+                    foreach (string inv in Invites)
                     {
-                        var proxies = ProxiesRichTxt.Text.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                        r.Proxy = HttpProxyClient.Parse(proxies[new Random(Guid.NewGuid().GetHashCode()).Next(Regex.Matches(ProxiesRichTxt.Text, @"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b:\d{2,5}").Count)]);
-                        r.Get($"{TokenSettings.domains[new Random(Guid.NewGuid().GetHashCode()).Next(TokenSettings.domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/invites/{invite}");
-                        dynamic info = JsonConvert.DeserializeObject(r.Response.ToString());
-                        string guildId = info.guild.id.ToString();
-                        CurrentStatusLbl.Text = "Leaving [Proxied]";
-                        CurrentStatusLbl.ForeColor = Color.Yellow;
-                        ThreadPool.SetMinThreads(500, 500);
-                        Parallel.ForEach(Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}").Cast<Match>(), async (m) =>
+                        if (!string.IsNullOrEmpty(ProxiesRichTxt.Text))
                         {
-                            await TokenSettings.LeaveServer(m.Value, guildId, true, proxies[new Random(Guid.NewGuid().GetHashCode()).Next(Regex.Matches(ProxiesRichTxt.Text, @"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b:\d{2,5}").Count)]).ConfigureAwait(false);
-                        });
-                    }
-                    else
-                    {
-                        r.Get($"{TokenSettings.domains[new Random(Guid.NewGuid().GetHashCode()).Next(TokenSettings.domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/invites/{invite}");
-                        dynamic info = JsonConvert.DeserializeObject(r.Response.ToString());
-                        string guildId = info.guild.id.ToString();
-                        CurrentStatusLbl.Text = "Leaving";
-                        CurrentStatusLbl.ForeColor = Color.Yellow;
-                        Parallel.ForEach(Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}").Cast<Match>(), async (m) =>
+                            var proxies = ProxiesRichTxt.Text.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                            r.Proxy = HttpProxyClient.Parse(proxies[new Random(Guid.NewGuid().GetHashCode()).Next(Regex.Matches(ProxiesRichTxt.Text, @"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b:\d{2,5}").Count)]);
+                            r.Get($"{TokenSettings.domains[new Random(Guid.NewGuid().GetHashCode()).Next(TokenSettings.domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/invites/{inv}");
+                            dynamic info = JsonConvert.DeserializeObject(r.Response.ToString());
+                            string guildId = info.guild.id.ToString();
+                            CurrentStatusLbl.Text = $"Leaving Guild - {invite} | [Proxied]";
+                            CurrentStatusLbl.ForeColor = Color.Yellow;
+                            ThreadPool.SetMinThreads(500, 500);
+                            Parallel.ForEach(Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}").Cast<Match>(), async (m) =>
+                            {
+                                await TokenSettings.LeaveServer(m.Value, guildId, true, proxies[new Random(Guid.NewGuid().GetHashCode()).Next(Regex.Matches(ProxiesRichTxt.Text, @"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b:\d{2,5}").Count)]).ConfigureAwait(false);
+                            });
+                        }
+                        else
                         {
-                            await TokenSettings.LeaveServer(m.Value, guildId, false, null).ConfigureAwait(false);
-                        });
+                            r.Get($"{TokenSettings.domains[new Random(Guid.NewGuid().GetHashCode()).Next(TokenSettings.domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/invites/{inv}");
+                            dynamic info = JsonConvert.DeserializeObject(r.Response.ToString());
+                            string guildId = info.guild.id.ToString();
+                            CurrentStatusLbl.Text = $"Leaving Guild - {invite}";
+                            CurrentStatusLbl.ForeColor = Color.Yellow;
+                            Parallel.ForEach(Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}").Cast<Match>(), async (m) =>
+                            {
+                                await TokenSettings.LeaveServer(m.Value, guildId, false, null).ConfigureAwait(false);
+                            });
+                        }
                     }
                 }
                 catch
@@ -226,28 +230,32 @@ namespace Tokens.rip_Token_Manager
                 invite = invite.Replace("/invites/", "");
                 invite = invite.Replace("v6/invites/", "");
                 invite = invite.Replace("/", "");
+                string[] Invites = invite.Split(',');
                 if (Regex.Match(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}").Success)
                 {
-                    if (!string.IsNullOrEmpty(ProxiesRichTxt.Text))
+                    foreach (string inv in Invites)
                     {
-                        var proxies = ProxiesRichTxt.Text.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                        CurrentStatusLbl.Text = $"Joining Guild - {invite} | [Proxied]";
-                        CurrentStatusLbl.ForeColor = Color.Yellow;
-                        ThreadPool.SetMinThreads(500, 500);
-                        Parallel.ForEach(Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}").Cast<Match>(), async (token) =>
+                        if (!string.IsNullOrEmpty(ProxiesRichTxt.Text))
                         {
-                            Thread.Sleep(DelayBar.Value * 1000);
-                            await TokenSettings.JoinServer(token.Value, invite, true, proxies[new Random(Guid.NewGuid().GetHashCode()).Next(Regex.Matches(ProxiesRichTxt.Text, @"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b:\d{2,5}").Count)], ServerVerificationBtn.FillColor).ConfigureAwait(false);
-                        });
-                    }
-                    else
-                    {
-                        CurrentStatusLbl.Text = $"Joining Guild | {invite}";
-                        CurrentStatusLbl.ForeColor = Color.Yellow;
-                        foreach (Match token in Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}"))
+                            var proxies = ProxiesRichTxt.Text.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                            CurrentStatusLbl.Text = $"Joining Guild - {invite} | [Proxied]";
+                            CurrentStatusLbl.ForeColor = Color.Yellow;
+                            ThreadPool.SetMinThreads(500, 500);
+                            Parallel.ForEach(Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}").Cast<Match>(), async (token) =>
+                            {
+                                Thread.Sleep(DelayBar.Value * 1000);
+                                await TokenSettings.JoinServer(token.Value, inv, true, proxies[new Random(Guid.NewGuid().GetHashCode()).Next(Regex.Matches(ProxiesRichTxt.Text, @"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b:\d{2,5}").Count)], ServerVerificationBtn.FillColor).ConfigureAwait(false);
+                            });
+                        }
+                        else
                         {
-                            Thread.Sleep(DelayBar.Value * 1000);
-                            await TokenSettings.JoinServer(token.Value, invite, false, null, ServerVerificationBtn.FillColor).ConfigureAwait(false);
+                            CurrentStatusLbl.Text = $"Joining Guild | {invite}";
+                            CurrentStatusLbl.ForeColor = Color.Yellow;
+                            foreach (Match token in Regex.Matches(TokensRichTxt.Text, @"[\w-]{24}\.[\w-]{6}\.[\w-]{25,27}|mfa\.[\w-]{84}"))
+                            {
+                                Thread.Sleep(DelayBar.Value * 1000);
+                                await TokenSettings.JoinServer(token.Value, inv, false, null, ServerVerificationBtn.FillColor).ConfigureAwait(false);
+                            }
                         }
                     }
                 }
