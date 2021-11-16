@@ -12,6 +12,10 @@ using Discord.WebSocket;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.Text;
+using Discord.Gateway;
+using System.Collections.Generic;
+using Discord;
+using Color = System.Drawing.Color;
 
 namespace Tokens.rip_Token_Manager
 {
@@ -25,6 +29,7 @@ namespace Tokens.rip_Token_Manager
             r.ClearAllHeaders();
             r.EnableMiddleHeaders = false;
             r.AllowEmptyHeaderValues = false;
+            r.IgnoreInvalidCookie = true;
             r.AddHeader("Accept", "*/*");
             r.AddHeader("Accept-Encoding", "gzip, deflate, br");
             r.AddHeader("Accept-Language", "en-US");
@@ -107,12 +112,22 @@ namespace Tokens.rip_Token_Manager
             "https://canary.discordapp.com"
         };
         public static Random random = new Random(Guid.NewGuid().GetHashCode());
+        /// <summary>
+        /// Return random unsorted characters 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static string RandomCookie(int a)
         {
-            const string chars = "abcdefghijklmnopqrstuvwxyz0123456789"; //Chars to choose from
+            const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
             return new string(Enumerable.Repeat(chars, a)
-              .Select(s => s[random.Next(s.Length)]).ToArray()); //Enumrate random char
+              .Select(s => s[random.Next(s.Length)]).ToArray()); // Return random char string
         }
+        /// <summary>
+        /// Return random int
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static string RandomNumber(int a)
         {
             const string nr = "01234456789";
@@ -138,34 +153,57 @@ namespace Tokens.rip_Token_Manager
         }
         #endregion
         #region Send Friend Request
-        public static async Task SendFriendReq(string Username, string Token, bool proxied, string proxy = null)
+        public static async Task SendFriendReq(string Username, string Token, bool MassGuild, bool proxied, List<string> users = null, string proxy = null)
         {
-            if (Username.Contains("#"))
+            if (!MassGuild)
             {
-                try
+                if (Username.Contains("#"))
                 {
-                    HttpRequest r = new HttpRequest();
-                    r.Settings(Token);
-                    if (proxied)
+                    try
                     {
-                        r.Proxy = HttpProxyClient.Parse(proxy);
+                        HttpRequest r = new HttpRequest();
+                        r.Settings(Token);
+                        if (proxied)
+                        {
+                            r.Proxy = HttpProxyClient.Parse(proxy);
+                        }
+                        r.Post($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/users/@me/relationships", $"{{\"username\": \"{Username.Split('#')[0]}\", \"discriminator\": \"{Username.Split('#')[1]}\"}}", "application/json");
                     }
-                    r.Post($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/users/@me/relationships", $"{{\"username\": \"{Username.Split('#')[0]}\", \"discriminator\": \"{Username.Split('#')[1]}\"}}", "application/json");
+                    catch
+                    { }
                 }
-                catch
-                { }
+                else
+                {
+                    try
+                    {
+                        HttpRequest r = new HttpRequest();
+                        r.Settings(Token);
+                        if (proxied)
+                        {
+                            r.Proxy = HttpProxyClient.Parse(proxy);
+                        }
+                        r.Put($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/users/@me/relationships/{Username}", "{}", "application/json");
+                    }
+                    catch
+                    {
+                    }
+                }
             }
             else
             {
                 try
                 {
-                    HttpRequest r = new HttpRequest();
-                    r.Settings(Token);
-                    if (proxied)
+                    foreach (string user in users)
                     {
-                        r.Proxy = HttpProxyClient.Parse(proxy);
+                        HttpRequest r = new HttpRequest();
+                        r.Settings(Token);
+                        if (proxied)
+                        {
+                            r.Proxy = HttpProxyClient.Parse(proxy);
+                        }
+                        r.Put($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/users/@me/relationships/{user}", "{}", "application/json");
+                        r.Dispose();
                     }
-                    r.Put($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/users/@me/relationships/{Username}", "{}", "application/json");
                 }
                 catch
                 {
@@ -228,7 +266,7 @@ namespace Tokens.rip_Token_Manager
         #endregion
         #region WSS Requests
             #region DiscordConfig
-            public static DiscordSocketClient _UserToken = new DiscordSocketClient(new DiscordSocketConfig
+            public static Discord.WebSocket.DiscordSocketClient _UserToken = new Discord.WebSocket.DiscordSocketClient(new Discord.WebSocket.DiscordSocketConfig
             {
                 LogLevel = Discord.LogSeverity.Debug
             });
@@ -236,68 +274,68 @@ namespace Tokens.rip_Token_Manager
             #region Send Token Online
             public static async Task SendOnline(string _Token)
             {
-            #region Works but trash
-            try
-            {
-                await _UserToken.LoginAsync(0, _Token).ConfigureAwait(false);
-                await _UserToken.StartAsync().ConfigureAwait(false);
-                await _UserToken.SetActivityAsync(new Discord.Game("Tokens.rip", Discord.ActivityType.Playing, Discord.ActivityProperties.None, "Cheap Discord Tokens & Members"));
-            }
-            catch
-            {
-                return;
-            }
-            #endregion
-            #region Non Working Code
-            //    using (var WebServerWSS = new WebSocket($"wss://gateway.discord.gg/?v=9&encoding=json"))
-            //    {
-            //        string WssResponse = "Still null";
-            //        string json = @"{
-            //'op': 2,
-            //'d': {
-            //            'token': 'ODkwOTE3MTQ3MjU2MTcyNTY3.YU2xTA.3xwynDmpArqjPeu0K6TNK-tHGI8',
-            //    'properties': {
-            //                '$os': 'Windows',
-            //        '$browser': 'Chrome',
-            //        '$device': 'Android Device'
-            //    },
-            //    'presence': {
-            //                'game': 'fkn',
-            //        'status': 'online',
-            //        'since': 0,
-            //        'afk': False
-            //    }
-            //        },
-            //'s': None,
-            //'t': None
-            //}";
-            //    WebServerWSS.OnMessage += (sender, e) =>
-            //        {
-            //            MessageBox.Show(e.Data);
-            //            WssResponse = e.Data;
-            //        };
-            //        WebServerWSS.OnOpen += (sender, e) =>
-            //        {
-            //            MessageBox.Show(json);
-            //            WebServerWSS.Send(json);
-            //        };
-            //        WebServerWSS.OnClose += (sender, e) =>
-            //        {
-            //            Console.WriteLine(e.Code);
-            //        };
-            //        WebServerWSS.OnError += (sender, e) =>
-            //        {
-            //            Console.WriteLine(e.Message);
-            //        };
-            //        WebServerWSS.Connect();
-            //        MessageBox.Show(WssResponse + " This is working now?");
-            //        //dynamic ResponseJson = JsonConvert.DeserializeObject(WssResponse);
-            //        //Console.WriteLine(ResponseJson);
-            //        //int sleep = ResponseJson.d.heartbeat_interval;
-            //        //Console.WriteLine(WssResponse);
-            //        //Console.Write(sleep);
-            //    }
-            #region
+                #region Works but trash
+                try
+                {
+                    await _UserToken.LoginAsync(0, _Token).ConfigureAwait(false);
+                    await _UserToken.StartAsync().ConfigureAwait(false);
+                    await _UserToken.SetActivityAsync(new Discord.Game("Tokens.rip", Discord.ActivityType.Playing, Discord.ActivityProperties.None, "Cheap Discord Tokens & Members"));
+                }
+                catch
+                {
+                    return;
+                }
+                #endregion
+                #region Non Working Code
+                //    using (var WebServerWSS = new WebSocket($"wss://gateway.discord.gg/?v=9&encoding=json"))
+                //    {
+                //        string WssResponse = "Still null";
+                //        string json = @"{
+                //'op': 2,
+                //'d': {
+                //            'token': 'ODkwOTE3MTQ3MjU2MTcyNTY3.YU2xTA.3xwynDmpArqjPeu0K6TNK-tHGI8',
+                //    'properties': {
+                //                '$os': 'Windows',
+                //        '$browser': 'Chrome',
+                //        '$device': 'Android Device'
+                //    },
+                //    'presence': {
+                //                'game': 'fkn',
+                //        'status': 'online',
+                //        'since': 0,
+                //        'afk': False
+                //    }
+                //        },
+                //'s': None,
+                //'t': None
+                //}";
+                //    WebServerWSS.OnMessage += (sender, e) =>
+                //        {
+                //            MessageBox.Show(e.Data);
+                //            WssResponse = e.Data;
+                //        };
+                //        WebServerWSS.OnOpen += (sender, e) =>
+                //        {
+                //            MessageBox.Show(json);
+                //            WebServerWSS.Send(json);
+                //        };
+                //        WebServerWSS.OnClose += (sender, e) =>
+                //        {
+                //            Console.WriteLine(e.Code);
+                //        };
+                //        WebServerWSS.OnError += (sender, e) =>
+                //        {
+                //            Console.WriteLine(e.Message);
+                //        };
+                //        WebServerWSS.Connect();
+                //        MessageBox.Show(WssResponse + " This is working now?");
+                //        //dynamic ResponseJson = JsonConvert.DeserializeObject(WssResponse);
+                //        //Console.WriteLine(ResponseJson);
+                //        //int sleep = ResponseJson.d.heartbeat_interval;
+                //        //Console.WriteLine(WssResponse);
+                //        //Console.Write(sleep);
+                //    }
+                #region
             //HttpListener httpListener = new HttpListener();
             //httpListener.Prefixes.Add($"wss://gateway.discord.gg/?v={new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}&encoding=json");
             //httpListener.Start();
@@ -323,14 +361,14 @@ namespace Tokens.rip_Token_Manager
             //    }
             //}
             #endregion
-            #endregion
-        }
-        #endregion
-        #region Join VC
-        public static async void JoinVoiceAsync()
-            {
+                #endregion
             }
             #endregion
+            #region Join VC
+        public static async void JoinVoiceAsync()
+        {
+        }
+        #endregion
             #region Leave VC
         public static async void LeaveVoiceAsync()
         {
@@ -351,7 +389,7 @@ namespace Tokens.rip_Token_Manager
         }
         #endregion
         #region Join Guild
-        public static async Task JoinServer(string Token, string invite, bool proxied, string proxy, Color btnColor)
+        public static async Task JoinServer(string Token, string invite, bool proxied, string proxy, Color Flag)
         {
             try
             {
@@ -362,7 +400,7 @@ namespace Tokens.rip_Token_Manager
                     r.Proxy = HttpProxyClient.Parse(proxy);
                 }
                 r.Post($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/invites/" + invite);
-                if (btnColor == Color.FromArgb(105, 105, 205))
+                if (Flag == Color.FromArgb(105, 105, 205))
                 {
                     var request = new HttpClient();
                     request.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", Token);
@@ -416,6 +454,15 @@ namespace Tokens.rip_Token_Manager
         }
         #endregion
         #region Change Username
+        /// <summary>
+        /// Async Task to Change Username of token
+        /// </summary>
+        /// <param name="Token"></param>
+        /// <param name="Password"></param>
+        /// <param name="Username"></param>
+        /// <param name="proxied"></param>
+        /// <param name="proxy"></param>
+        /// <returns></returns>
         public static async Task ChangeUsername(string Token, string Password, string Username, bool proxied, string proxy = null)
         {
             Username = Username.Replace("\n", "").Replace("\r", "");
@@ -526,7 +573,7 @@ namespace Tokens.rip_Token_Manager
         #endregion
         #region Change Hypesquad
         /// <summary>
-        /// Change HypeSquad of token
+        /// Change HypeSquad of Token
         /// </summary>
         /// <param name="Token"></param>
         /// <param name="HypeSquad"></param>
@@ -545,9 +592,11 @@ namespace Tokens.rip_Token_Manager
         #endregion
         #region Add about me/Bio
         /// <summary>
-        /// Add About Me information
+        /// Add \*About Me*\ Information to Token
         /// </summary>
         /// <param name="Token"></param>
+        /// <param name="AboutMe"></param>
+        /// <param name="Proxied"></param>
         /// <param name="Proxy"></param>
         public static async void AddBio(string Token, string AboutMe = null, bool Proxied = false, string Proxy = null)
         {
@@ -558,6 +607,26 @@ namespace Tokens.rip_Token_Manager
             r.Patch($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/users/@me", $"{{\"bio\": \"{AboutMe}\"}}", "application/json");
         }
         #endregion
+        #region Join Group
+        public static async Task JoinGroup(string Token, string ChannelId, string RecipientID, bool Proxied = false, string Proxy = null, string GroupInvite = null)
+        {
+            var r = new HttpRequest();
+            r.Settings(Token);
+            r.IgnoreProtocolErrors = true;
+            if (GroupInvite == null)
+            {
+                if (Proxied)
+                {
+                    r.Proxy = new HttpProxyClient(Proxy);
+                }
+                r.Put($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6,9)}/channels/{ChannelId}/recipients/{RecipientID}");
+            }
+            else
+            {
+                await JoinServer(Token, GroupInvite, Proxied, Proxy, Color.Black);
+            }
+        }
+        #endregion
         #region Send Message
         /// <summary>
         /// Send Message To Channel Using Token
@@ -565,22 +634,36 @@ namespace Tokens.rip_Token_Manager
         /// <param name="Token"></param>
         /// <param name="ChannelId"></param>
         /// <param name="Message"></param>
+        /// <param name="TTS"></param>
+        /// <param name="refId"></param>
+        /// <param name="Proxied"></param>
         /// <param name="Proxies"></param>
         public static async void SendMsg(string Token, string ChannelId, string Message, bool TTS = false, string refId = null, bool Proxied = false, string Proxies = null)
         {
             try
             {
+                var JsonMessageFormatting = new System.Net.Http.StringContent($"{{\"content\":\"{Message}\",\"nonce\":\"\",\"tts\":{TTS.ToString().ToLower()}}}", Encoding.UTF8, "application/json");
+                try
+                {
+                    if (refId == "Message Reference Id" | refId == null | string.IsNullOrEmpty(refId))
+                        JsonMessageFormatting = new System.Net.Http.StringContent($"{{\"content\":\"{Message}\",\"nonce\":\"\",\"tts\":{TTS.ToString().ToLower()},\"message_reference\":{{\"channel_id\":\"{ChannelId}\",\"message_id\":\"{refId}\"}}}}", Encoding.UTF8, "application/json");
+                }
+                catch (Exception x)
+                {
+                    Console.WriteLine(x.Message);
+                }
                 var r = new HttpRequest();
                 var s = new HttpClient();
                 var http = new HttpRequestMessage()
                 {
                     Method = System.Net.Http.HttpMethod.Post,
-                    Content = new System.Net.Http.StringContent("{\"content\":\"nOu\",\"nonce\":\"\",\"tts\":false}", Encoding.UTF8, "application/json"),
-                    RequestUri = new Uri("https://discord.com/api/v7/channels/894015565054771234/messages")
+                    Content = JsonMessageFormatting,
+                    RequestUri = new Uri($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/v{new Random(Guid.NewGuid().GetHashCode()).Next(6,9)}/channels/{ChannelId}/messages")
                 };
                 s.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", Token);
                 var response = await s.SendAsync(http).ConfigureAwait(false);
                 Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+                #region Leaf.xNet Method
                 //r.AddHeader("Authorization", Token);
                 //r.Post("https://discord.com/api/v7/channels/894015565054771234/messages", "{\"content\":\"nOu\",\"nonce\":\"\",\"tts\":false}", "application/json");
                 //if (Proxied) r.Proxy = HttpProxyClient.Parse(Proxies);
@@ -589,8 +672,20 @@ namespace Tokens.rip_Token_Manager
                 //else msgToSpam = $"{{\"content\":\"{Message}\",\"nonce\":\"\",\"tts\":{TTS.ToString().ToLower()},\"message_reference\":{{\"channel_id\":\"{ChannelId}\",\"message_id\":\"{refId}\"}}}}";
                 //r.Settings(Token);
                 //r.Post($"{domains[new Random(Guid.NewGuid().GetHashCode()).Next(domains.Length)]}/api/v{new Random(Guid.NewGuid().GetHashCode()).Next(6, 9)}/channels/{ChannelId}/messages", msgToSpam, "application/json");
+                #endregion
             }
-            catch{}
+            catch {}
+        }
+        #endregion
+        #region Parse Guild Users
+        public static List<string> FetchUsers(string token, ulong guildId, ulong channelId)
+        {
+            Discord.Gateway.DiscordSocketClient client = new Discord.Gateway.DiscordSocketClient(null);
+            client.Login(token);
+            List<string> users = new List<string>();
+            foreach (GuildMember member in client.GetGuildChannelMembers(guildId, channelId))
+                users.Add(member.User.Id.ToString());
+            return users;
         }
         #endregion
         #region Create Account
